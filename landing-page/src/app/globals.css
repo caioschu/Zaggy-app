@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --zaggy-orange: #FF6B35;
+  --zaggy-orange-dark: #E55A2B;
+  --zaggy-orange-light: #FF8A5B;
+  --secondary: #00D4AA;
+  --accent: #FFD700;
+  --danger: #E74C3C;
+  --success: #27AE60;
+  --warning: #F39C12;
+  --dark: #2C3E50;
+  --light: #F8F9FA;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-white text-gray-900;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-zaggy-orange hover:bg-zaggy-orange-dark text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl;
+  }
+  
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-50 text-zaggy-orange border-2 border-zaggy-orange font-semibold py-3 px-6 rounded-xl transition-all duration-200;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-white text-white hover:bg-white hover:text-zaggy-orange font-semibold py-3 px-6 rounded-xl transition-all duration-200;
+  }
+  
+  .section-padding {
+    @apply py-20 px-4 sm:px-6 lg:px-8;
+  }
+  
+  .container-max {
+    @apply max-w-7xl mx-auto;
+  }
+  
+  .gradient-zaggy {
+    background: linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%);
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-zaggy-orange to-zaggy-orange-dark bg-clip-text text-transparent;
+  }
+}

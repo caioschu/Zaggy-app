@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --zaggy-orange: #FF6B35;
+  --zaggy-orange-dark: #E55A2B;
+  --zaggy-orange-light: #FF8A5B;
+  --secondary: #00D4AA;
+  --accent: #FFD700;
+  --danger: #E74C3C;
+  --success: #27AE60;
+  --warning: #F39C12;
+  --dark: #2C3E50;
+  --light: #F8F9FA;
+}
+
+@layer base {
+  body {
+    @apply bg-light text-gray-900;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-zaggy-orange hover:bg-zaggy-orange-dark text-white font-semibold py-2 px-4 rounded-lg transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+  }
+  
+  .input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zaggy-orange focus:border-transparent;
+  }
+}
