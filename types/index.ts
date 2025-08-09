@@ -37,6 +37,7 @@ export interface RestauranteProfile {
   };
   responsavel?: string;
   favoritos: string[];
+  configuracoes?: any;
   created_at: string;
 }
 

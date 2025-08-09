@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Smartphone, Users, Star, TrendingUp } from 'lucide-react-native';
 import ZaggyLogo from '@/components/ZaggyLogo';
 
@@ -48,11 +48,35 @@ const CTAFinalSection = () => {
 
         {/* CTAs */}
         <View style={styles.ctaContainer}>
-          <TouchableOpacity style={styles.primaryButton}>
+          <TouchableOpacity 
+            style={styles.primaryButton}
+            onPress={() => {
+              Alert.alert(
+                '🚀 Zaggy App',
+                'Baixe o app completo e organize sua vida profissional!\n\n• Central financeira multi-apps\n• Controle de documentos\n• Gestão da moto\n• MEI organizado',
+                [
+                  { text: 'Mais Tarde' },
+                  { text: 'Baixar Agora', onPress: () => console.log('Download app') }
+                ]
+              );
+            }}
+          >
             <Smartphone size={28} color="#FFFFFF" />
             <Text style={styles.primaryButtonText}>📱 Baixar App Grátis</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.secondaryButton}>
+          <TouchableOpacity 
+            style={styles.secondaryButton}
+            onPress={() => {
+              Alert.alert(
+                '🍕 Portal Restaurante',
+                'Acesse nossa plataforma completa para restaurantes!\n\n• Gestão de vagas\n• Controle de entregadores\n• Pagamentos automáticos\n• Relatórios financeiros',
+                [
+                  { text: 'Cancelar' },
+                  { text: 'Acessar Portal', onPress: () => console.log('Navegar para restaurante') }
+                ]
+              );
+            }}
+          >
             <Users size={28} color="#FFFFFF" />
             <Text style={styles.secondaryButtonText}>🍕 Sou Restaurante</Text>
           </TouchableOpacity>

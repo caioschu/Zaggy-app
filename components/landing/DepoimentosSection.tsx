@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { Star } from 'lucide-react-native';
 
 const DepoimentosSection = () => {
@@ -93,7 +93,19 @@ const DepoimentosSection = () => {
           <Text style={styles.ctaSubtitle}>
             Baixe grátis e comece a organizar sua vida profissional hoje mesmo
           </Text>
-          <TouchableOpacity style={styles.ctaButton}>
+          <TouchableOpacity 
+            style={styles.ctaButton}
+            onPress={() => {
+              Alert.alert(
+                '🚀 Junte-se aos 1.000+ Entregadores!',
+                'Faça como João, Maria e Carlos:\n\n💰 Aumente seus ganhos\n📋 Organize documentos\n⏰ Economize tempo\n\nGrátis para sempre!',
+                [
+                  { text: 'Continuar Navegando' },
+                  { text: 'Baixar Zaggy', onPress: () => console.log('Download app') }
+                ]
+              );
+            }}
+          >
             <Text style={styles.ctaButtonText}>📱 Baixar Zaggy Grátis</Text>
           </TouchableOpacity>
         </View>

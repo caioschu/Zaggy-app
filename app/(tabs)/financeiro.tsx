@@ -1,16 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  Plus, 
-  TrendingUp, 
-  TrendingDown, 
-  Calendar,
-  Filter,
-  Download,
-  Eye,
-  EyeOff
-} from 'lucide-react-native';
+import { useAuth } from '@/contexts/AuthContext';
+import { Plus, TrendingUp, TrendingDown, Calendar, Filter, Download, Eye, EyeOff, ChartBar as BarChart3, Target, DollarSign } from 'lucide-react-native';
 
 const FinanceCard = ({ children, style = {} }) => (
   <View style={[styles.card, style]}>
@@ -29,41 +21,74 @@ const AppFinanceCard = ({ app, data, color }) => (
     <Text style={styles.appEarnings}>R$ {data.ganhos.toFixed(2)}</Text>
     <View style={styles.appStats}>
       <Text style={styles.appStat}>{data.entregas} entregas</Text>
-      <Text style={styles.appStat}>{data.km}km</Text>
+      <Text style={styles.appStat}>{data.km || 0}km</Text>
     </View>
   </View>
 );
 
 export default function FinanceiroScreen() {
+  const { user, profile, entregadorProfile } = useAuth();
   const [showValues, setShowValues] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState('hoje');
+  const [dadosFinanceiros, setDadosFinanceiros] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const dadosFinanceiros = {
-    hoje: {
-      zaggy: { ganhos: 85.50, entregas: 6, km: 45 },
-      ifood: { ganhos: 127.30, entregas: 9, km: 67 },
-      rappi: { ganhos: 45.80, entregas: 3, km: 23 },
-      uber: { ganhos: 67.20, entregas: 4, km: 31 },
-      total_bruto: 325.80,
-      gastos: { combustivel: 67.50, alimentacao: 18.00 },
-      total_liquido: 240.30,
-      ganho_por_hora: 28.23
-    },
-    semana: {
-      total_bruto: 1847.50,
-      total_liquido: 1456.20,
-      gastos_total: 391.30,
-      dias_trabalhados: 6
-    },
-    mes: {
-      total_bruto: 7890.40,
-      total_liquido: 6234.80,
-      gastos_total: 1655.60,
-      dias_trabalhados: 24
+  useEffect(() => {
+    carregarDadosFinanceiros();
+  }, [selectedPeriod, user]);
+
+  const carregarDadosFinanceiros = async () => {
+    if (!user || !entregadorProfile) return;
+
+    try {
+      // Simular carregamento de dados financeiros
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const mockData = {
+        hoje: {
+          zaggy: { ganhos: 85.50, entregas: 6, km: 45 },
+          ifood: { ganhos: 127.30, entregas: 9, km: 67 },
+          rappi: { ganhos: 45.80, entregas: 3, km: 23 },
+          uber: { ganhos: 67.20, entregas: 4, km: 31 },
+          total_bruto: 325.80,
+          gastos: { combustivel: 67.50, alimentacao: 18.00 },
+          total_liquido: 240.30,
+          ganho_por_hora: 28.23
+        },
+        semana: {
+          total_bruto: 1847.50,
+          total_liquido: 1456.20,
+          gastos_total: 391.30,
+          dias_trabalhados: 6
+        },
+        mes: {
+          total_bruto: 7890.40,
+          total_liquido: 6234.80,
+          gastos_total: 1655.60,
+          dias_trabalhados: 24
+        }
+      };
+
+      setDadosFinanceiros(mockData);
+    } catch (error) {
+      console.error('Erro ao carregar dados financeiros:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os dados financeiros');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const dados = dadosFinanceiros[selectedPeriod];
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Carregando dados financeiros...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const dados = dadosFinanceiros?.[selectedPeriod];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -118,25 +143,25 @@ export default function FinanceiroScreen() {
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Receita Bruta</Text>
               <Text style={styles.summaryValue}>
-                {showValues ? `R$ ${dados.total_bruto?.toFixed(2) || dados.ganhos?.toFixed(2)}` : '••••••'}
+                {showValues ? `R$ ${dados?.total_bruto?.toFixed(2) || '0,00'}` : '••••••'}
               </Text>
             </View>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Gastos</Text>
               <Text style={styles.summaryValueNegative}>
-                {showValues ? `- R$ ${dados.gastos_total?.toFixed(2) || (dados.gastos?.combustivel + dados.gastos?.alimentacao)?.toFixed(2)}` : '••••••'}
+                {showValues ? `- R$ ${dados?.gastos_total?.toFixed(2) || (dados?.gastos ? (dados.gastos.combustivel + dados.gastos.alimentacao).toFixed(2) : '0,00')}` : '••••••'}
               </Text>
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Líquido</Text>
               <Text style={styles.summaryValueFinal}>
-                {showValues ? `R$ ${dados.total_liquido?.toFixed(2) || dados.total_liquido?.toFixed(2)}` : '••••••'}
+                {showValues ? `R$ ${dados?.total_liquido?.toFixed(2) || '0,00'}` : '••••••'}
               </Text>
             </View>
           </View>
 
-          {selectedPeriod === 'hoje' && (
+          {selectedPeriod === 'hoje' && dados?.ganho_por_hora && (
             <View style={styles.hourlyRate}>
               <TrendingUp size={16} color="#27AE60" />
               <Text style={styles.hourlyRateText}>
@@ -147,7 +172,7 @@ export default function FinanceiroScreen() {
         </FinanceCard>
 
         {/* Apps Performance */}
-        {selectedPeriod === 'hoje' && (
+        {selectedPeriod === 'hoje' && dados?.zaggy && (
           <FinanceCard>
             <View style={styles.appsHeader}>
               <Text style={styles.sectionTitle}>Performance por App</Text>
@@ -180,7 +205,7 @@ export default function FinanceiroScreen() {
             </View>
 
             <View style={styles.bestApp}>
-              <Text style={styles.bestAppLabel}>🏆 Melhor performance hoje:</Text>
+              <Text style={styles.bestAppLabel}>Melhor performance hoje:</Text>
               <Text style={styles.bestAppName}>iFood - R$ 127,30</Text>
             </View>
           </FinanceCard>
@@ -199,16 +224,16 @@ export default function FinanceiroScreen() {
                 </TouchableOpacity>
                 <View style={styles.appOptions}>
                   <TouchableOpacity style={styles.appOption}>
-                    <Text style={styles.appOptionText}>📱 Zaggy</Text>
+                    <Text style={styles.appOptionText}>Zaggy</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.appOption}>
-                    <Text style={styles.appOptionText}>🍔 iFood</Text>
+                    <Text style={styles.appOptionText}>iFood</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.appOption}>
-                    <Text style={styles.appOptionText}>🛵 Rappi</Text>
+                    <Text style={styles.appOptionText}>Rappi</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.appOption}>
-                    <Text style={styles.appOptionText}>🚗 Uber Eats</Text>
+                    <Text style={styles.appOptionText}>Uber Eats</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -261,13 +286,13 @@ export default function FinanceiroScreen() {
             <Text style={styles.gastosQuickTitle}>Adicionar Rápido:</Text>
             <View style={styles.gastosQuickButtons}>
               <TouchableOpacity style={styles.gastoQuickButton}>
-                <Text style={styles.gastoQuickText}>⛽ Combustível</Text>
+                <Text style={styles.gastoQuickText}>Combustível</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.gastoQuickButton}>
-                <Text style={styles.gastoQuickText}>🍽️ Alimentação</Text>
+                <Text style={styles.gastoQuickText}>Alimentação</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.gastoQuickButton}>
-                <Text style={styles.gastoQuickText}>🔧 Manutenção</Text>
+                <Text style={styles.gastoQuickText}>Manutenção</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -315,9 +340,34 @@ export default function FinanceiroScreen() {
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.quickAction}>
-              <TrendingUp size={24} color="#FF6B35" />
+              <Target size={24} color="#FF6B35" />
               <Text style={styles.quickActionText}>Metas</Text>
             </TouchableOpacity>
+          </View>
+        </FinanceCard>
+
+        {/* Análise Avançada */}
+        <FinanceCard>
+          <Text style={styles.sectionTitle}>Análise Avançada</Text>
+          
+          <View style={styles.analysisGrid}>
+            <View style={styles.analysisItem}>
+              <BarChart3 size={20} color="#FF6B35" />
+              <Text style={styles.analysisLabel}>Ticket Médio</Text>
+              <Text style={styles.analysisValue}>R$ 14,80</Text>
+            </View>
+            
+            <View style={styles.analysisItem}>
+              <TrendingUp size={20} color="#27AE60" />
+              <Text style={styles.analysisLabel}>Crescimento</Text>
+              <Text style={styles.analysisValue}>+12%</Text>
+            </View>
+            
+            <View style={styles.analysisItem}>
+              <DollarSign size={20} color="#3B82F6" />
+              <Text style={styles.analysisLabel}>Margem</Text>
+              <Text style={styles.analysisValue}>73.8%</Text>
+            </View>
           </View>
         </FinanceCard>
       </ScrollView>
@@ -330,17 +380,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F9FA',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#5F6368',
+    fontWeight: '600',
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
   },
   title: {
     fontSize: 24,
@@ -675,5 +730,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#5F6368',
     fontWeight: '600',
+  },
+  analysisGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  analysisItem: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  analysisLabel: {
+    fontSize: 12,
+    color: '#5F6368',
+    fontWeight: '600',
+  },
+  analysisValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#202124',
   },
 });

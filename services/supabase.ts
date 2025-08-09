@@ -43,7 +43,7 @@ export const getCurrentUser = async () => {
   return user;
 };
 
-// Database helpers
+// Profile helpers
 export const getProfile = async (userId: string) => {
   const { data, error } = await supabase
     .from('profiles')
@@ -62,12 +62,22 @@ export const getEntregadorProfile = async (userId: string) => {
   return { data, error };
 };
 
+export const getEmpresaProfile = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('empresa_profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+  return { data, error };
+};
+
+// Vagas helpers
 export const getVagasDisponiveis = async (entregadorId: string) => {
   const { data, error } = await supabase
     .from('vagas')
     .select(`
       *,
-      restaurante_profiles!inner(nome_fantasia, endereco)
+      empresa_profiles!inner(nome_fantasia, endereco)
     `)
     .eq('status', 'aberta')
     .gte('data_inicio', new Date().toISOString().split('T')[0])
@@ -87,6 +97,7 @@ export const aceitarVaga = async (vagaId: string, entregadorId: string) => {
   return { data, error };
 };
 
+// Receitas helpers
 export const getReceitasExternas = async (entregadorId: string, dataInicio?: string, dataFim?: string) => {
   let query = supabase
     .from('receitas_externas')
@@ -111,6 +122,9 @@ export const adicionarReceitaExterna = async (receita: {
   valor_total: number;
   numero_entregas?: number;
   data_trabalho: string;
+  horario_inicio?: string;
+  horario_fim?: string;
+  km_rodados?: number;
   observacoes?: string;
 }) => {
   const { data, error } = await supabase
@@ -121,6 +135,7 @@ export const adicionarReceitaExterna = async (receita: {
   return { data, error };
 };
 
+// Gastos helpers
 export const getGastos = async (entregadorId: string, dataInicio?: string, dataFim?: string) => {
   let query = supabase
     .from('gastos_entregadores')
@@ -141,10 +156,12 @@ export const getGastos = async (entregadorId: string, dataInicio?: string, dataF
 
 export const adicionarGasto = async (gasto: {
   entregador_id: string;
-  categoria: 'combustivel' | 'manutencao' | 'alimentacao';
+  categoria: 'combustivel' | 'manutencao' | 'alimentacao' | 'equipamentos' | 'outros';
+  subcategoria?: string;
   valor: number;
   descricao?: string;
   foto_nota?: string;
+  km_atual?: number;
   data_gasto: string;
   deducao_ir?: boolean;
 }) => {
@@ -156,12 +173,39 @@ export const adicionarGasto = async (gasto: {
   return { data, error };
 };
 
+// Documentos helpers
 export const getDocumentos = async (entregadorId: string) => {
   const { data, error } = await supabase
     .from('documentos_entregadores')
     .select('*')
     .eq('entregador_id', entregadorId)
     .order('created_at', { ascending: false });
+  return { data, error };
+};
+
+export const atualizarDocumento = async (documentoId: string, dados: any) => {
+  const { data, error } = await supabase
+    .from('documentos_entregadores')
+    .update(dados)
+    .eq('id', documentoId)
+    .select()
+    .single();
+  return { data, error };
+};
+
+// Ofertas helpers
+export const getOfertas = async (categoria?: string, localizacao?: { lat: number, lng: number }) => {
+  let query = supabase
+    .from('ofertas')
+    .select('*')
+    .eq('status', 'ativa')
+    .order('created_at', { ascending: false });
+
+  if (categoria && categoria !== 'todas') {
+    query = query.eq('categoria', categoria);
+  }
+
+  const { data, error } = await query;
   return { data, error };
 };
 
@@ -193,4 +237,47 @@ export const subscribeToUserNotifications = (userId: string, callback: (payload:
       callback
     )
     .subscribe();
+};
+
+// Estatísticas e relatórios
+export const getEstatisticasFinanceiras = async (entregadorId: string, periodo: 'hoje' | 'semana' | 'mes') => {
+  const hoje = new Date();
+  let dataInicio: string;
+
+  switch (periodo) {
+    case 'hoje':
+      dataInicio = hoje.toISOString().split('T')[0];
+      break;
+    case 'semana':
+      const inicioSemana = new Date(hoje);
+      inicioSemana.setDate(hoje.getDate() - hoje.getDay());
+      dataInicio = inicioSemana.toISOString().split('T')[0];
+      break;
+    case 'mes':
+      dataInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().split('T')[0];
+      break;
+  }
+
+  const { data: receitas } = await getReceitasExternas(entregadorId, dataInicio);
+  const { data: gastos } = await getGastos(entregadorId, dataInicio);
+
+  const totalReceitas = receitas?.reduce((acc, r) => acc + r.valor_total, 0) || 0;
+  const totalGastos = gastos?.reduce((acc, g) => acc + g.valor, 0) || 0;
+  const totalEntregas = receitas?.reduce((acc, r) => acc + (r.numero_entregas || 0), 0) || 0;
+
+  return {
+    receita_total: totalReceitas,
+    gastos_total: totalGastos,
+    lucro_liquido: totalReceitas - totalGastos,
+    total_entregas: totalEntregas,
+    ticket_medio: totalEntregas > 0 ? totalReceitas / totalEntregas : 0,
+    receitas_por_app: receitas?.reduce((acc, r) => {
+      acc[r.app_nome] = (acc[r.app_nome] || 0) + r.valor_total;
+      return acc;
+    }, {} as Record<string, number>) || {},
+    gastos_por_categoria: gastos?.reduce((acc, g) => {
+      acc[g.categoria] = (acc[g.categoria] || 0) + g.valor;
+      return acc;
+    }, {} as Record<string, number>) || {}
+  };
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { CircleCheck as CheckCircle, Smartphone } from 'lucide-react-native';
 import ZaggyLogo from '@/components/ZaggyLogo';
 
@@ -65,7 +65,19 @@ const SolucoesSection = () => {
               ))}
             </View>
 
-            <TouchableOpacity style={styles.ctaButton}>
+            <TouchableOpacity 
+              style={styles.ctaButton}
+              onPress={() => {
+                Alert.alert(
+                  '🎯 Começar com Zaggy',
+                  'Pronto para organizar sua vida profissional?\n\n✅ Grátis para sempre\n✅ Sem taxas escondidas\n✅ Suporte especializado',
+                  [
+                    { text: 'Talvez Depois' },
+                    { text: 'Começar Agora!', onPress: () => console.log('Iniciar cadastro') }
+                  ]
+                );
+              }}
+            >
               <Smartphone size={24} color="#FFFFFF" />
               <Text style={styles.ctaButtonText}>Começar Agora - É Grátis!</Text>
             </TouchableOpacity>

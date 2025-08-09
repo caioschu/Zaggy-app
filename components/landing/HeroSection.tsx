@@ -1,9 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import { Smartphone, Users, Star } from 'lucide-react-native';
 import ZaggyLogo from '@/components/ZaggyLogo';
+import { useRouter } from 'expo-router';
 
 const HeroSection = () => {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -32,15 +35,41 @@ const HeroSection = () => {
 
           {/* CTAs */}
           <View style={styles.ctaContainer}>
-            <TouchableOpacity style={styles.primaryButton}>
+            <TouchableOpacity 
+              style={styles.primaryButton}
+              onPress={() => {
+                router.push('/auth/signup');
+              }}
+            >
               <Smartphone size={24} color="#FFFFFF" />
-              <Text style={styles.primaryButtonText}>📱 Baixar App Grátis</Text>
+              <Text style={styles.primaryButtonText}>📱 Começar Grátis</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryButton}>
+            <TouchableOpacity 
+              style={styles.secondaryButton}
+              onPress={() => {
+                Alert.alert(
+                  '🍕 Portal Restaurante',
+                  'Em breve: Dashboard completo para restaurantes!\n\n• Criar vagas\n• Gerenciar entregadores\n• Pagamentos automáticos',
+                  [
+                    { text: 'OK' }
+                  ]
+                );
+              }}
+            >
               <Users size={24} color="#FFFFFF" />
               <Text style={styles.secondaryButtonText}>🍕 Sou Restaurante</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Login Link */}
+          <TouchableOpacity 
+            style={styles.loginLink}
+            onPress={() => router.push('/auth/login')}
+          >
+            <Text style={styles.loginLinkText}>
+              Já tem conta? <Text style={styles.loginLinkHighlight}>Fazer login</Text>
+            </Text>
+          </TouchableOpacity>
 
           {/* Social Proof */}
           <View style={styles.socialProof}>
@@ -233,6 +262,18 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontSize: 18,
     fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  loginLink: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  loginLinkText: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.8)',
+  },
+  loginLinkHighlight: {
+    fontWeight: '700',
     color: '#FFFFFF',
   },
   socialProof: {

@@ -147,16 +147,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   content: {
+    width: '100%',
     maxWidth: 1200,
     alignSelf: 'center',
   },
   mainSection: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     gap: 48,
     marginBottom: 64,
   },
   logoSection: {
-    flex: 2,
+    alignItems: 'center',
+    marginBottom: 40,
   },
   description: {
     fontSize: 18,
@@ -164,9 +166,12 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     marginTop: 24,
     marginBottom: 32,
+    textAlign: 'center',
+    maxWidth: 600,
   },
   contatoContainer: {
     gap: 16,
+    alignItems: 'center',
   },
   contatoItem: {
     flexDirection: 'row',
@@ -178,25 +183,31 @@ const styles = StyleSheet.create({
     color: '#BDC3C7',
   },
   linksSection: {
-    flex: 3,
-    flexDirection: 'row',
-    gap: 48,
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+    gap: 40,
+    alignItems: 'center',
   },
   linkColumn: {
-    flex: 1,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 200,
   },
   linkColumnTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 24,
+    marginBottom: 16,
+    textAlign: 'center',
   },
   linksList: {
-    gap: 12,
+    gap: 8,
+    alignItems: 'center',
   },
   linkText: {
     fontSize: 16,
     color: '#BDC3C7',
+    textAlign: 'center',
   },
   newsletterSection: {
     paddingTop: 48,
@@ -205,27 +216,29 @@ const styles = StyleSheet.create({
     marginBottom: 48,
   },
   newsletterContent: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 32,
+    gap: 24,
   },
   newsletterTitle: {
     fontSize: 24,
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 16,
+    textAlign: 'center',
   },
   newsletterDescription: {
     fontSize: 16,
     color: '#BDC3C7',
+    textAlign: 'center',
+    marginBottom: 16,
   },
   newsletterForm: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     gap: 16,
-    flex: 1,
+    width: '100%',
+    maxWidth: 300,
   },
   newsletterInput: {
-    flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
@@ -254,16 +267,20 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   legalLinks: {
-    flexDirection: 'row',
-    gap: 24,
+    flexDirection: 'column',
+    gap: 12,
+    flexWrap: 'wrap',
+    alignItems: 'center',
   },
   legalLinkText: {
     fontSize: 14,
     color: '#9AA0A6',
+    textAlign: 'center',
   },
   copyrightText: {
     fontSize: 14,
     color: '#9AA0A6',
+    textAlign: 'center',
   },
 });
 

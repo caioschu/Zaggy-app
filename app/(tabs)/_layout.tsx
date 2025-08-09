@@ -1,7 +1,35 @@
 import { Tabs } from 'expo-router';
-import { Chrome as Home, DollarSign, Bike, FileText, Briefcase, Tag, Globe } from 'lucide-react-native';
+import { Platform } from 'react-native';
+import { Chrome as Home, DollarSign, Bike, FileText, Briefcase, Tag, Users, Target, ChartBar as BarChart3 } from 'lucide-react-native';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function TabLayout() {
+  const { profile } = useAuth();
+
+  // No web, não mostrar tabs - será gerenciado pelo WebSidebarLayout
+  if (Platform.OS === 'web') {
+    return (
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: { display: 'none' },
+        }}>
+        <Tabs.Screen name="index" />
+        <Tabs.Screen name="financeiro" />
+        <Tabs.Screen name="vagas" />
+        <Tabs.Screen name="entregadores" />
+        <Tabs.Screen name="relatorios" />
+        <Tabs.Screen name="moto" />
+        <Tabs.Screen name="documentos" />
+        <Tabs.Screen name="mei" />
+        <Tabs.Screen name="ofertas" />
+      </Tabs>
+    );
+  }
+
+  // No mobile, tabs condicionais
+  const isEntregador = profile?.user_type === 'entregador';
+
   return (
     <Tabs
       screenOptions={{
@@ -39,51 +67,77 @@ export default function TabLayout() {
           ),
         }}
       />
+      {!isEntregador && (
+        <>
+          <Tabs.Screen
+            name="vagas"
+            options={{
+              title: 'Vagas',
+              tabBarIcon: ({ size, color }) => (
+                <Target size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="entregadores"
+            options={{
+              title: 'Entregadores',
+              tabBarIcon: ({ size, color }) => (
+                <Users size={size} color={color} />
+              ),
+            }}
+          />
+        </>
+      )}
       <Tabs.Screen
-        name="moto"
+        name="relatorios"
         options={{
-          title: 'Minha Moto',
+          title: 'Relatórios',
           tabBarIcon: ({ size, color }) => (
-            <Bike size={size} color={color} />
+            <BarChart3 size={size} color={color} />
           ),
         }}
       />
-      <Tabs.Screen
-        name="documentos"
-        options={{
-          title: 'Documentos',
-          tabBarIcon: ({ size, color }) => (
-            <FileText size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="mei"
-        options={{
-          title: 'MEI',
-          tabBarIcon: ({ size, color }) => (
-            <Briefcase size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="ofertas"
-        options={{
-          title: 'Ofertas',
-          tabBarIcon: ({ size, color }) => (
-            <Tag size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="landing"
-        options={{
-          title: 'Landing',
-          tabBarIcon: ({ size, color }) => (
-            <Globe size={size} color={color} />
-          ),
-        }}
-      />
+      {isEntregador && (
+        <>
+          <Tabs.Screen
+            name="moto"
+            options={{
+              title: 'Minha Moto',
+              tabBarIcon: ({ size, color }) => (
+                <Bike size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="documentos"
+            options={{
+              title: 'Documentos',
+              tabBarIcon: ({ size, color }) => (
+                <FileText size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="mei"
+            options={{
+              title: 'MEI',
+              tabBarIcon: ({ size, color }) => (
+                <Briefcase size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="ofertas"
+            options={{
+              title: 'Ofertas',
+              tabBarIcon: ({ size, color }) => (
+                <Tag size={size} color={color} />
+              ),
+            }}
+          />
+        </>
+      )}
     </Tabs>
   );
 }
